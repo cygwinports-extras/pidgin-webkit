@@ -1,0 +1,20 @@
+BZR_URI="lp:${PN}"
+BZR_BRANCH=${PV[3]}
+inherit bzr utils
+
+src_compile() {
+	lndirs
+	cd ${B}
+	check_pkg_config PIDGIN_WEBKIT "pidgin webkit-1.0"
+	for src in *.c
+	do
+		verbose ${CC} ${CFLAGS} ${PIDGIN_WEBKIT_CFLAGS} -c -o ${src%.c}.o ${src}
+	done
+	verbose ${CC} -shared ${LDFLAGS} -o webkit.dll *.o ${PIDGIN_WEBKIT_LIBS} || error "compile failed"
+}
+
+src_install() {
+	cd ${B}
+	exeinto /usr/lib/pidgin
+	doexe webkit.dll
+}
